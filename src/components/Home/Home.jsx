@@ -1,9 +1,11 @@
 import React from 'react'
+import PhotoGrid from '../PhotoGrid/PhotoGrid'
 
 const Home = () => {
   return (
-    <div>
-      <h2>Home</h2>
+    <div className='container mx-auto'>
+      <PhotoGrid></PhotoGrid>
+      
     </div>
   )
 }
