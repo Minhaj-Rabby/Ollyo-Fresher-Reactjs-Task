@@ -3,9 +3,8 @@ import PhotoGrid from '../PhotoGrid/PhotoGrid'
 
 const Home = () => {
   return (
-    <div className='container mx-auto'>
+    <div>
       <PhotoGrid></PhotoGrid>
-      
     </div>
   )
 }

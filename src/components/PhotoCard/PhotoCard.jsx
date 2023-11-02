@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
 
-const PhotoCard = ({ imageComponent }) => {
+const PhotoCard = ({ imageComponent,onSelect }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
     const handleIconClick = () => {
         setIsChecked(!isChecked);
+        onSelect(imageComponent);
     };
 
     const handleIconHover = () => {
