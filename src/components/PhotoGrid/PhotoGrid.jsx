@@ -6,7 +6,6 @@ const PhotoGrid = () => {
 
     const [imageComponents, setImageComponents] = useState([]);
 
-
     useEffect(() => {
         // Load and create image components dynamically
         const loadImages = async () => {
@@ -33,16 +32,20 @@ const PhotoGrid = () => {
         <div className="grid grid-cols-5 gap-6 container mx-auto mb-10 mt-10 ">
             {
                 imageComponents && imageComponents.length > 0 && (
-                    <div className="col-span-2 row-span-2 border-2 rounded-md">
-                        <img src={imageComponents[0].props.src} alt="" />
+                    <div className="col-span-2 row-span-2 ">
+                        <PhotoCard
+                            key={0}
+                            imageComponent={imageComponents[0]}
+                        ></PhotoCard>
+
                     </div>
                 )}
             {
                 imageComponents.slice(1).map((imageComponent, index) => (
-                   
+
                     <PhotoCard
-                    key={index}
-                    imageComponent={imageComponent}
+                        key={index}
+                        imageComponent={imageComponent}
                     ></PhotoCard>
                 ))}
 

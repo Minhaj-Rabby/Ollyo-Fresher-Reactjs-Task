@@ -6,7 +6,7 @@ const Header = () => {
   const selectedIPhoto = 0;
 
   return (
-    <div className='border-b-2 border-black-100'>
+    <div className='border-b-2 border-slate-300'>
       {
         selectedIPhoto == 0 ?
           < >
