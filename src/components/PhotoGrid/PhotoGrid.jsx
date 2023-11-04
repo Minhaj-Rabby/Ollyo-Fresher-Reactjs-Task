@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PhotoCard from '../PhotoCard/PhotoCard';
 import Header from '../Header/Header';
+import AddPhoto from '../AddPhoto/AddPhoto';
 
 const PhotoGrid = () => {
     const [imageComponents, setImageComponents] = useState([]);
@@ -61,6 +62,19 @@ const PhotoGrid = () => {
         }
     };
 
+    const handleAddImage = (imageFile) => {
+        // Create a new image component using the selected image file
+        const newImageComponent = {
+            key: imageComponents.length, // Generate a unique key based on the current number of images
+            src: URL.createObjectURL(imageFile), // Use a temporary URL for the selected image
+            alt: `New Image ${imageComponents.length + 1}`,
+            isChecked: false, // Initialize isChecked as false
+        };
+    
+        // Update the imageComponents state by adding the new image component
+        setImageComponents([...imageComponents, newImageComponent]);
+    };
+
     const dragItem = useRef(null);
     const dragOverItem = useRef(null);
 
@@ -85,8 +99,9 @@ const PhotoGrid = () => {
                 selectedComponents={selectedComponents}
                 handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
             ></Header>
-            <div className="grid xl:grid-cols-5 lg:grid-cols-3 sm:grid-cols-2 gap-6 px-6 my-6">
-                {imageComponents.map((imageComponent, index) => (
+            <div className="grid xl:grid-cols-5 lg:grid-cols-3 object-contain sm:grid-cols-2 sm:gap-6 gap-3 sm:px-6 px-2 my-6">
+                {
+                imageComponents.map((imageComponent, index) => (
                     <PhotoCard
                         key={index}
                         imageComponent={imageComponent}
@@ -98,6 +113,7 @@ const PhotoGrid = () => {
                         onDragEnter={() => (dragOverItem.current = index)}
                     ></PhotoCard>
                 ))}
+                <AddPhoto className='object-contain' handleAddImage={handleAddImage} ></AddPhoto>
             </div>
         </div>
     );
