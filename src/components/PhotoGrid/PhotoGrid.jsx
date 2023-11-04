@@ -1,88 +1,84 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PhotoCard from '../PhotoCard/PhotoCard';
 import Header from '../Header/Header';
 
 const PhotoGrid = () => {
     const [imageComponents, setImageComponents] = useState([]);
     const [selectedComponents, setSelectedComponents] = useState([]);
-    
-
     useEffect(() => {
-        // Load and create image components dynamically
         const loadImages = async () => {
             const imagePaths = import.meta.glob("../../assets/*");
             const imagePromises = Object.keys(imagePaths).map((imagePath) => imagePaths[imagePath]());
             const imageModules = await Promise.all(imagePromises);
 
-            const imageComponents = imageModules.map((module, index) => (
-                <img
-                    key={index}
-                    src={module.default}
-                    alt={`Image ${index + 1}`}
-                />
-            ));
+            const initialImageComponents = imageModules.map((module, index) => ({
+                key: index,
+                src: module.default,
+                alt: `Image ${index + 1}`,
+                isChecked: false, // Initialize isChecked as false
+            }));
 
-            setImageComponents(imageComponents);
+            setImageComponents(initialImageComponents);
         };
 
         loadImages();
     }, []);
 
-    const handleTodeleteSelectedComponents = () => {
-        const updatedImageComponents = imageComponents.filter(
-            (imageComponent) => !selectedComponents.includes(imageComponent)
-        );
+    // Callback function to update checkstatus for selected components
+    const handleToggleCheck = (id) => {
+        const updatedImageComponents = imageComponents.map((component) => {
+            if (component.key === id) {
+                return { ...component, isChecked: !component.isChecked };
+            }
+            return component;
+        });
 
         setImageComponents(updatedImageComponents);
+    };
+    // Callback function to delete selected components
+    const handleTodeleteSelectedComponents = () => {
+        const updatedImageComponents = imageComponents.filter(
+            (imageComponent) => imageComponent.isChecked == false
+        );
+        setImageComponents(updatedImageComponents);
         setSelectedComponents([]);
-         
-        
-        // Clear the selected components
     };
 
-    // Callback function to update selected components
+    // Callback function to update selected Fcomponents
     const updateSelectedComponents = (imageComponent) => {
-        if (selectedComponents.includes(imageComponent)) {
-            // Deselect the component
-            setSelectedComponents(selectedComponents.filter(item => item !== imageComponent));
+        const isAlreadySelected = selectedComponents.some((item) => {
+            return item.key === imageComponent.key && item.src === imageComponent.src;
+        });
+
+        if (isAlreadySelected) {
+            // Deselect the component by filtering it out
+            setSelectedComponents(selectedComponents.filter((item) => {
+                return item.key !== imageComponent.key || item.src !== imageComponent.src;
+            }));
         } else {
-            // Select the component
+            // Select the component if it's not already in the selected array
             setSelectedComponents([...selectedComponents, imageComponent]);
         }
-        
     };
 
     return (
-        <>
-         <Header
-         selectedComponents={selectedComponents}
-         handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
-
-         ></Header>
-        <div className="grid grid-cols-5 gap-6 container mx-auto mb-10 mt-10 ">
-            {
-                imageComponents && imageComponents.length > 0 && (
-                    <div className="col-span-2 row-span-2 ">
-                        <PhotoCard
-                            key={0}
-                            imageComponent={imageComponents[0]}
-                            onSelect={updateSelectedComponents} // Pass the callback function
-                        ></PhotoCard>
-                    </div>
-                )}
-            {
-                imageComponents.slice(1).map((imageComponent, index) => (
+        <div className='w-1/2 mx-auto border-2  border-slate-300 rounded-md'>
+            <Header
+                selectedComponents={selectedComponents}
+                handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
+            ></Header>
+            <div className="grid grid-cols-5 gap-6 px-6 mb-10 mt-10">
+                {imageComponents.map((imageComponent, index) => (
                     <PhotoCard
                         key={index}
                         imageComponent={imageComponent}
-                        onSelect={updateSelectedComponents} // Pass the callback function
+                        updateSelectedComponents={updateSelectedComponents}
+                        onToggleCheck={handleToggleCheck}
+                        index={index}
                     ></PhotoCard>
                 ))}
-            <div>
-                <h2>Selected Components:{selectedComponents.length}</h2>
             </div>
         </div>
-        </>
     );
 };
 

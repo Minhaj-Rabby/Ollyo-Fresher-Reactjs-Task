@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import Main from './components/Layout/Main';
-import Home from './components/Home/Home';
+import PhotoGrid from './components/PhotoGrid/PhotoGrid';
 
 const router=createBrowserRouter([
   {
@@ -16,7 +16,7 @@ const router=createBrowserRouter([
     children:[
       {
         path:'/',
-        element:<Home></Home>
+        element:<PhotoGrid></PhotoGrid>
       },
     ],
   },
