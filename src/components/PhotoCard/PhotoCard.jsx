@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-const PhotoCard = ({ imageComponent, updateSelectedComponents, onToggleCheck,handleSort,index}) => {
+const PhotoCard = ({ imageComponent, updateSelectedComponents, onToggleCheck,handleSort,index, onDragStart, onDragEnter}) => {
    
     const handleIconClick = () => {
         updateSelectedComponents(imageComponent);
@@ -14,8 +14,8 @@ const PhotoCard = ({ imageComponent, updateSelectedComponents, onToggleCheck,han
             className={` group border-2  border-slate-300 relative ${index === 0 ? "col-span-2 row-span-2" : "col-span-1 row-span-1"} before:absolute before:h-full before:w-full rounded-lg before:transition-colors before:cursor-move `}
             onClick={handleIconClick}
             draggable
-            onDragStart={() => (dragItem.current = imageComponent.key)}
-            onDragEnter={() => (dragOverItem.current = imageComponent.key)}
+            onDragStart={ onDragStart}
+            onDragEnter={onDragEnter}
             onDragEnd={handleSort}
             onDragOver={(e) => e.preventDefault()}
         >

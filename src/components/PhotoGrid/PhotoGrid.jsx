@@ -61,13 +61,31 @@ const PhotoGrid = () => {
         }
     };
 
+    const dragItem = useRef(null);
+    const dragOverItem = useRef(null);
+
+    const handleSort = () => {
+        console.log(dragItem);
+        console.log(dragOverItem);
+        let _items = [...imageComponents];
+        const draggedItemContent = _items.splice(dragItem.current, 1)[0];
+
+        _items.splice(dragOverItem.current, 0, draggedItemContent);
+
+        dragItem.current = null;
+        dragOverItem.current = null;
+
+        setImageComponents([..._items]);
+
+    };
+
     return (
-        <div className='w-1/2 mx-auto border-2  border-slate-300 rounded-md'>
+        <div className='xl:w-1/2 mx-auto border-2 bg-white xl:my-10 border-slate-300 rounded-lg'>
             <Header
                 selectedComponents={selectedComponents}
                 handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
             ></Header>
-            <div className="grid grid-cols-5 gap-6 px-6 mb-10 mt-10">
+            <div className="grid xl:grid-cols-5 lg:grid-cols-3 sm:grid-cols-2 gap-6 px-6 my-6">
                 {imageComponents.map((imageComponent, index) => (
                     <PhotoCard
                         key={index}
@@ -75,6 +93,9 @@ const PhotoGrid = () => {
                         updateSelectedComponents={updateSelectedComponents}
                         onToggleCheck={handleToggleCheck}
                         index={index}
+                        handleSort={handleSort}
+                        onDragStart={() => (dragItem.current = index)}
+                        onDragEnter={() => (dragOverItem.current = index)}
                     ></PhotoCard>
                 ))}
             </div>

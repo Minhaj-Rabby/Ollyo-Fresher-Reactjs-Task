@@ -5,18 +5,18 @@ import { faCheckSquare } from '@fortawesome/free-solid-svg-icons'
 const Header = ({selectedComponents,handleTodeleteSelectedComponents}) => {
 
   return (
-    <div className='border-b-2 border-slate-300'>
+    <div className='border-b-2 bg-white border-slate-300 sticky top-0 z-50 px-6'>
       {
         selectedComponents == 0 ?
           < >
-            <div className='container mx-auto navbar bg-base-100'>
+            <div className='container mx-auto navbar'>
               <h3 className='font-bold text-xl'>
                 Gallery</h3>
             </div>
           </>
           :
           <>
-            <div className=" container mx-auto navbar bg-base-100">
+            <div className=" container mx-auto navbar">
               <div className="flex-1">
                 <div className='flex items-center'>
                   <FontAwesomeIcon className='h-6 text-blue-700 mr-3' icon={faCheckSquare} />
