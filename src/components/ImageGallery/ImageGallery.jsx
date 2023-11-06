@@ -1,30 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PhotoCard from '../PhotoCard/PhotoCard';
 import Header from '../Header/Header';
 import AddPhoto from '../AddPhoto/AddPhoto';
+import ImageCard from '../ImageCard/ImageCard';
 
-const PhotoGrid = () => {
-    const [imageComponents, setImageComponents] = useState([]);
-    const [selectedComponents, setSelectedComponents] = useState([]);
+const ImageGallery = () => {
 
+    //Declearing all the State 
+    const [imageDatas, setImageDatas] = useState([]);
+    const [selectedImageDatas, setSelectedImageDatas] = useState([]);
     const [dragging, setDragging] = useState(false);
     const [dragOverItemIndex, setDragOverItemIndex] = useState(null);
-    const [dragItemIndex ,setDragItemIndex] = useState(null);
+    const [dragItemIndex, setDragItemIndex] = useState(null);
 
+    // Reading all the Image from the File
     useEffect(() => {
         const loadImages = async () => {
             const imagePaths = import.meta.glob("../../assets/*");
             const imagePromises = Object.keys(imagePaths).map((imagePath) => imagePaths[imagePath]());
             const imageModules = await Promise.all(imagePromises);
 
+            // Setting image information
             const initialImageComponents = imageModules.map((module, index) => ({
                 key: index,
                 src: module.default,
                 alt: `Image ${index + 1}`,
-                isChecked: false, // Initialize isChecked as false
+                isChecked: false, // Declaring Initial Selected Image state
             }));
 
-            setImageComponents(initialImageComponents);
+            setImageDatas(initialImageComponents);
         };
 
         loadImages();
@@ -32,129 +35,132 @@ const PhotoGrid = () => {
 
     // Callback function to update checkstatus for selected components
     const handleToggleCheck = (id) => {
-        const updatedImageComponents = imageComponents.map((component) => {
+        const updatedImageComponents = imageDatas.map((component) => {
             if (component.key === id) {
                 return { ...component, isChecked: !component.isChecked };
             }
             return component;
         });
 
-        setImageComponents(updatedImageComponents);
+        setImageDatas(updatedImageComponents);
     };
+
     // Callback function to delete selected components
-    const handleTodeleteSelectedComponents = () => {
-        const updatedImageComponents = imageComponents.filter(
-            (imageComponent) => imageComponent.isChecked == false
+    const handledeleteSelectedData = () => {
+        const updatedImageComponents = imageDatas.filter(
+            (imageData) => imageData.isChecked == false
         );
-        setImageComponents(updatedImageComponents);
-        setSelectedComponents([]);
+        setImageDatas(updatedImageComponents);
+        setSelectedImageDatas([]);
     };
 
     // Callback function to update selected Fcomponents
-    const updateSelectedComponents = (imageComponent) => {
-        const isAlreadySelected = selectedComponents.some((item) => {
-            return item.key === imageComponent.key && item.src === imageComponent.src;
+    const handleUpdateSelectedImageData = (imageData) => {
+        const isAlreadySelected = selectedImageDatas.some((item) => {
+            return item.key === imageData.key && item.src === imageData.src;
         });
 
         if (isAlreadySelected) {
             // Deselect the component by filtering it out
-            setSelectedComponents(selectedComponents.filter((item) => {
-                return item.key !== imageComponent.key || item.src !== imageComponent.src;
+            setSelectedImageDatas(selectedImageDatas.filter((item) => {
+                return item.key !== imageData.key || item.src !== imageData.src;
             }));
         } else {
             // Select the component if it's not already in the selected array
-            setSelectedComponents([...selectedComponents, imageComponent]);
+            setSelectedImageDatas([...selectedImageDatas, imageData]);
         }
     };
 
+    
+    // Callback function to add image
     const handleAddImage = (imageFile) => {
-        // Create a new image component using the selected image file
+
+        // Create a new image  Data using the selected image file
         const newImageComponent = {
-            key: imageComponents.length, // Generate a unique key based on the current number of images
+            key: imageDatas.length, // Generate a unique key based on the current number of images
             src: URL.createObjectURL(imageFile), // Use a temporary URL for the selected image
-            alt: `New Image ${imageComponents.length + 1}`,
-            isChecked: false, // Initialize isChecked as false
+            alt: `New Image ${imageDatas.length + 1}`,
+            isChecked: false,
         };
 
-        // Update the imageComponents state by adding the new image component
-        setImageComponents([...imageComponents, newImageComponent]);
+        // Update the imageDatas state by adding the new imagData
+        setImageDatas([...imageDatas, newImageComponent]);
     };
+
 
     const dragItem = useRef(null);
     const dragOverItem = useRef(null);
 
 
-
+    // Event handler for onDragStart
     const handleDragStart = (e, index) => {
-        console.log('start index :', index)
         e.dataTransfer.setData("text/plain", index);
-        console.log('Drag Before: ',dragItem)
-
         dragItem.current = index;
-        console.log('Drag After: ',dragItem.current)
         setDragging(true);
         setDragItemIndex(index);
     };
 
+     // Event handlers for onDragEnter
     const handleDragEnter = (e, index) => {
-        console.log("Enter Index :", index)
         e.preventDefault()
         dragOverItem.current = index;
         setDragOverItemIndex(index);
     };
 
+     // Event handlers for onDragEnd
     const handleDragEnd = () => {
+        let _items = [...imageDatas];
+        const draggedItemContent = _items.splice(dragItem.current, 1)[0]; // remove the Dragged Image
 
-        console.log("Drag End");
-        console.log(dragItem);
-        console.log(dragOverItem);
-        let _items = [...imageComponents];
-        const draggedItemContent = _items.splice(dragItem.current, 1)[0];
+        _items.splice(dragOverItem.current, 0, draggedItemContent); //sort the image by LTR
 
-        _items.splice(dragOverItem.current, 0, draggedItemContent);
-
-        dragItem.current = null;
+        dragItem.current = null; //set the reference value to null
         dragOverItem.current = null;
 
+        //Setting the Dragging index values 
         setDragging(false);
         setDragOverItemIndex(null);
         setDragItemIndex(null)
 
-        setImageComponents([..._items]);
+        setImageDatas([..._items]); //set the sort Image data to state
 
     };
 
     return (
         <div className='xl:w-1/2 mx-auto border-2 bg-white xl:my-10 border-slate-300 rounded-lg'>
+           {/* Displaying Header Section */}
             <Header
-                selectedComponents={selectedComponents}
-                handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
+                selectedImageDatas={selectedImageDatas}
+                handledeleteSelectedData={handledeleteSelectedData}
             ></Header>
+
+            {/* Displaying all the Images to the Grid */}
             <div className="grid xl:grid-cols-5 lg:grid-cols-4 object-contain md:grid-cols-3 sm:grid-cols-2 sm:gap-6 gap-3 sm:px-6 px-2 my-6">
                 {
-                    imageComponents.map((imageComponent, index) => (
-                        <PhotoCard
+                    imageDatas.map((imageData, index) => (
+                        <ImageCard
 
                             key={index}
                             index={index}
                             dragItemIndex={dragItemIndex}
                             dragOverItemIndex={dragOverItemIndex}
                             dragging={dragging}
-                            imageComponent={imageComponent}
-                            onToggleCheck={handleToggleCheck}
-                            updateSelectedComponents={updateSelectedComponents}
+                            imageData={imageData}
+                            handleToggleCheck={handleToggleCheck}
+                            handleUpdateSelectedImageData={handleUpdateSelectedImageData}
                             handleDragStart={handleDragStart}
                             handleDragEnd={handleDragEnd}
                             handleDragEnter={handleDragEnter}
 
-                        ></PhotoCard>
+                        ></ImageCard>
 
                     ))
                 }
+                {/* Add Photos Section */}
                 <AddPhoto handleAddImage={handleAddImage} ></AddPhoto>
             </div>
         </div>
     );
 };
 
-export default PhotoGrid;
+export default ImageGallery;
