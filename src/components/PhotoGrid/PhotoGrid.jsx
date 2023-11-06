@@ -6,6 +6,11 @@ import AddPhoto from '../AddPhoto/AddPhoto';
 const PhotoGrid = () => {
     const [imageComponents, setImageComponents] = useState([]);
     const [selectedComponents, setSelectedComponents] = useState([]);
+
+    const [dragging, setDragging] = useState(false);
+    const [dragOverItemIndex, setDragOverItemIndex] = useState(null);
+    const [dragItemIndex ,setDragItemIndex] = useState(null);
+
     useEffect(() => {
         const loadImages = async () => {
             const imagePaths = import.meta.glob("../../assets/*");
@@ -70,7 +75,7 @@ const PhotoGrid = () => {
             alt: `New Image ${imageComponents.length + 1}`,
             isChecked: false, // Initialize isChecked as false
         };
-    
+
         // Update the imageComponents state by adding the new image component
         setImageComponents([...imageComponents, newImageComponent]);
     };
@@ -78,7 +83,29 @@ const PhotoGrid = () => {
     const dragItem = useRef(null);
     const dragOverItem = useRef(null);
 
-    const handleSort = () => {
+
+
+    const handleDragStart = (e, index) => {
+        console.log('start index :', index)
+        e.dataTransfer.setData("text/plain", index);
+        console.log('Drag Before: ',dragItem)
+
+        dragItem.current = index;
+        console.log('Drag After: ',dragItem.current)
+        setDragging(true);
+        setDragItemIndex(index);
+    };
+
+    const handleDragEnter = (e, index) => {
+        console.log("Enter Index :", index)
+        e.preventDefault()
+        dragOverItem.current = index;
+        setDragOverItemIndex(index);
+    };
+
+    const handleDragEnd = () => {
+
+        console.log("Drag End");
         console.log(dragItem);
         console.log(dragOverItem);
         let _items = [...imageComponents];
@@ -88,6 +115,10 @@ const PhotoGrid = () => {
 
         dragItem.current = null;
         dragOverItem.current = null;
+
+        setDragging(false);
+        setDragOverItemIndex(null);
+        setDragItemIndex(null)
 
         setImageComponents([..._items]);
 
@@ -99,21 +130,28 @@ const PhotoGrid = () => {
                 selectedComponents={selectedComponents}
                 handleTodeleteSelectedComponents={handleTodeleteSelectedComponents}
             ></Header>
-            <div className="grid xl:grid-cols-5 lg:grid-cols-3 object-contain sm:grid-cols-2 sm:gap-6 gap-3 sm:px-6 px-2 my-6">
+            <div className="grid xl:grid-cols-5 lg:grid-cols-4 object-contain md:grid-cols-3 sm:grid-cols-2 sm:gap-6 gap-3 sm:px-6 px-2 my-6">
                 {
-                imageComponents.map((imageComponent, index) => (
-                    <PhotoCard
-                        key={index}
-                        imageComponent={imageComponent}
-                        updateSelectedComponents={updateSelectedComponents}
-                        onToggleCheck={handleToggleCheck}
-                        index={index}
-                        handleSort={handleSort}
-                        onDragStart={() => (dragItem.current = index)}
-                        onDragEnter={() => (dragOverItem.current = index)}
-                    ></PhotoCard>
-                ))}
-                <AddPhoto className='object-contain' handleAddImage={handleAddImage} ></AddPhoto>
+                    imageComponents.map((imageComponent, index) => (
+                        <PhotoCard
+
+                            key={index}
+                            index={index}
+                            dragItemIndex={dragItemIndex}
+                            dragOverItemIndex={dragOverItemIndex}
+                            dragging={dragging}
+                            imageComponent={imageComponent}
+                            onToggleCheck={handleToggleCheck}
+                            updateSelectedComponents={updateSelectedComponents}
+                            handleDragStart={handleDragStart}
+                            handleDragEnd={handleDragEnd}
+                            handleDragEnter={handleDragEnter}
+
+                        ></PhotoCard>
+
+                    ))
+                }
+                <AddPhoto handleAddImage={handleAddImage} ></AddPhoto>
             </div>
         </div>
     );
